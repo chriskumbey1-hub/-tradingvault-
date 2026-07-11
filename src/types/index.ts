@@ -19,6 +19,14 @@ export type PlatformType =
   | "kraken"
   | "ibkr"
   | "exness"
+  | "maven"
+  | "ftmo"
+  | "fundednext"
+  | "myfundedfx"
+  | "fundedtrader"
+  | "topstep"
+  | "e8funding"
+  | "surgetrader"
   | "manual";
 
 export type ConnectionStatus =
@@ -55,7 +63,7 @@ export interface TradingAccount {
 export interface Platform {
   id: PlatformType;
   name: string;
-  category: "forex" | "crypto" | "multi";
+  category: "forex" | "crypto" | "multi" | "prop";
   hasApi: boolean;
   description: string;
   logoColor: string;

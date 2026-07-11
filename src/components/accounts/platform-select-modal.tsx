@@ -32,6 +32,14 @@ const platformIcons: Record<string, string> = {
   ibkr: "IB",
   manual: "MN",
   exness: "EX",
+  maven: "MV",
+  ftmo: "FT",
+  fundednext: "FN",
+  myfundedfx: "MF",
+  fundedtrader: "FT",
+  topstep: "TS",
+  e8funding: "E8",
+  surgetrader: "ST",
 };
 
 export function PlatformSelectModal({ open, onOpenChange, onSelect }: PlatformSelectModalProps) {
@@ -46,6 +54,7 @@ export function PlatformSelectModal({ open, onOpenChange, onSelect }: PlatformSe
 
   const forex = filtered.filter((p) => p.category === "forex");
   const crypto = filtered.filter((p) => p.category === "crypto");
+  const prop = filtered.filter((p) => p.category === "prop");
   const multi = filtered.filter((p) => p.category === "multi");
 
   return (
@@ -89,6 +98,18 @@ export function PlatformSelectModal({ open, onOpenChange, onSelect }: PlatformSe
             <PlatformSection
               title="Crypto Exchanges"
               platforms={crypto}
+              hoveredId={hoveredId}
+              onHover={setHoveredId}
+              onSelect={(id) => {
+                onOpenChange(false);
+                onSelect(id);
+              }}
+            />
+          )}
+          {prop.length > 0 && (
+            <PlatformSection
+              title="Prop Firms"
+              platforms={prop}
               hoveredId={hoveredId}
               onHover={setHoveredId}
               onSelect={(id) => {
