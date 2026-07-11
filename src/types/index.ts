@@ -6,6 +6,27 @@ export interface User {
   created_at: string;
 }
 
+export type PlatformType =
+  | "mt5"
+  | "mt4"
+  | "matchtrader"
+  | "ctrader"
+  | "dxtrade"
+  | "tradelocker"
+  | "binance"
+  | "bybit"
+  | "coinbase"
+  | "kraken"
+  | "ibkr"
+  | "manual";
+
+export type ConnectionStatus =
+  | "connected"
+  | "disconnected"
+  | "syncing"
+  | "error"
+  | "connecting";
+
 export interface TradingAccount {
   id: string;
   user_id: string;
@@ -15,7 +36,28 @@ export interface TradingAccount {
   initial_balance: number;
   current_balance: number;
   currency: string;
+  platform: PlatformType;
+  server_name: string;
+  login_id: string;
+  encrypted_password: string;
+  connection_status: ConnectionStatus;
+  last_sync: string | null;
+  equity: number;
+  margin: number;
+  free_margin: number;
+  leverage: number;
+  open_positions: number;
+  account_number: string;
   created_at: string;
+}
+
+export interface Platform {
+  id: PlatformType;
+  name: string;
+  category: "forex" | "crypto" | "multi";
+  hasApi: boolean;
+  description: string;
+  logoColor: string;
 }
 
 export type MarketType =
@@ -104,4 +146,9 @@ export interface TradeFormData {
   screenshot_url?: string;
   status: TradeStatus;
   account_id: string;
+}
+
+export interface ConnectionStage {
+  label: string;
+  status: "pending" | "active" | "done" | "error";
 }

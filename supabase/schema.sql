@@ -14,6 +14,18 @@ CREATE TABLE trading_accounts (
   initial_balance DECIMAL(15,2) NOT NULL DEFAULT 0,
   current_balance DECIMAL(15,2) NOT NULL DEFAULT 0,
   currency TEXT NOT NULL DEFAULT 'USD',
+  platform TEXT DEFAULT 'manual',
+  server_name TEXT DEFAULT '',
+  login_id TEXT DEFAULT '',
+  encrypted_password TEXT DEFAULT '',
+  connection_status TEXT DEFAULT 'disconnected',
+  last_sync TIMESTAMPTZ,
+  equity DECIMAL(15,2) DEFAULT 0,
+  margin DECIMAL(15,2) DEFAULT 0,
+  free_margin DECIMAL(15,2) DEFAULT 0,
+  leverage INTEGER DEFAULT 100,
+  open_positions INTEGER DEFAULT 0,
+  account_number TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
@@ -158,5 +170,7 @@ CREATE INDEX idx_trades_trade_date ON trades(trade_date);
 CREATE INDEX idx_trades_symbol ON trades(symbol);
 CREATE INDEX idx_trades_strategy ON trades(strategy);
 CREATE INDEX idx_trading_accounts_user_id ON trading_accounts(user_id);
+CREATE INDEX idx_trading_accounts_platform ON trading_accounts(platform);
+CREATE INDEX idx_trading_accounts_connection_status ON trading_accounts(connection_status);
 CREATE INDEX idx_strategies_user_id ON strategies(user_id);
 CREATE INDEX idx_tags_user_id ON tags(user_id);

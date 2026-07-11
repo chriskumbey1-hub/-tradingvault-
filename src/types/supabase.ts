@@ -19,6 +19,18 @@ export interface Database {
           initial_balance: number;
           current_balance: number;
           currency: string;
+          platform: string;
+          server_name: string;
+          login_id: string;
+          encrypted_password: string;
+          connection_status: string;
+          last_sync: string | null;
+          equity: number;
+          margin: number;
+          free_margin: number;
+          leverage: number;
+          open_positions: number;
+          account_number: string;
           created_at: string;
         };
         Insert: {
@@ -30,6 +42,18 @@ export interface Database {
           initial_balance?: number;
           current_balance?: number;
           currency?: string;
+          platform?: string;
+          server_name?: string;
+          login_id?: string;
+          encrypted_password?: string;
+          connection_status?: string;
+          last_sync?: string | null;
+          equity?: number;
+          margin?: number;
+          free_margin?: number;
+          leverage?: number;
+          open_positions?: number;
+          account_number?: string;
           created_at?: string;
         };
         Update: {
@@ -41,6 +65,18 @@ export interface Database {
           initial_balance?: number;
           current_balance?: number;
           currency?: string;
+          platform?: string;
+          server_name?: string;
+          login_id?: string;
+          encrypted_password?: string;
+          connection_status?: string;
+          last_sync?: string | null;
+          equity?: number;
+          margin?: number;
+          free_margin?: number;
+          leverage?: number;
+          open_positions?: number;
+          account_number?: string;
           created_at?: string;
         };
       };
