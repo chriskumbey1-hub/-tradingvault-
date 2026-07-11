@@ -45,7 +45,7 @@ export default function SignupPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/auth/login?check_email=true");
+      router.push("/auth/login");
     }
   };
 
