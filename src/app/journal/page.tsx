@@ -128,7 +128,7 @@ export default function JournalPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-zinc-100">Trading Journal</h1>
             <p className="text-sm text-zinc-400">
@@ -139,7 +139,8 @@ export default function JournalPage() {
             <Link href="/journal/import">
               <Button variant="outline" className="gap-2">
                 <Upload className="h-4 w-4" />
-                Import CSV
+                <span className="hidden sm:inline">Import CSV</span>
+                <span className="sm:hidden">Import</span>
               </Button>
             </Link>
             <Link href="/journal/new">
@@ -204,21 +205,21 @@ export default function JournalPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
+                        <TableHead className="hidden sm:table-cell">Date</TableHead>
                         <TableHead>Symbol</TableHead>
                         <TableHead>Direction</TableHead>
-                        <TableHead>Entry</TableHead>
-                        <TableHead>Exit</TableHead>
+                        <TableHead className="hidden md:table-cell">Entry</TableHead>
+                        <TableHead className="hidden md:table-cell">Exit</TableHead>
                         <TableHead>P&L</TableHead>
-                        <TableHead>Strategy</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="hidden lg:table-cell">Strategy</TableHead>
+                        <TableHead className="hidden sm:table-cell">Status</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredTrades.map((trade) => (
                         <TableRow key={trade.id}>
-                          <TableCell className="text-zinc-300">
+                          <TableCell className="hidden sm:table-cell text-zinc-300">
                             {new Date(trade.trade_date).toLocaleDateString()}
                           </TableCell>
                           <TableCell className="font-medium text-zinc-100">
@@ -240,10 +241,10 @@ export default function JournalPage() {
                               {trade.direction.toUpperCase()}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-zinc-300">
+                          <TableCell className="hidden md:table-cell text-zinc-300">
                             {trade.entry_price}
                           </TableCell>
-                          <TableCell className="text-zinc-300">
+                          <TableCell className="hidden md:table-cell text-zinc-300">
                             {trade.exit_price ?? "—"}
                           </TableCell>
                           <TableCell
@@ -254,10 +255,10 @@ export default function JournalPage() {
                             {(trade.profit_loss || 0) >= 0 ? "+" : ""}
                             ${(trade.profit_loss || 0).toLocaleString()}
                           </TableCell>
-                          <TableCell className="text-zinc-300">
+                          <TableCell className="hidden lg:table-cell text-zinc-300">
                             {trade.strategy ?? "—"}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden sm:table-cell">
                             <Badge
                               variant={
                                 trade.status === "win"

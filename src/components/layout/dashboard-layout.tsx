@@ -13,6 +13,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [collapsed, setCollapsed] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
   const { user, loading } = useUser();
   const router = useRouter();
   const supabase = React.useMemo(() => createClient(), []);
@@ -32,7 +33,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-zinc-950">
-      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
+      <div className="hidden md:block">
+        <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
+      </div>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div
+            className="fixed inset-0 bg-black/60"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 z-50 w-64">
+            <Sidebar collapsed={false} onToggle={() => setMobileOpen(false)} />
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar
           user={{
@@ -41,8 +57,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             avatar: user?.user_metadata?.avatar_url,
           }}
           onLogout={handleLogout}
+          onMenuToggle={() => setMobileOpen(!mobileOpen)}
         />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

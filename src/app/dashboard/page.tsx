@@ -246,20 +246,20 @@ export default function DashboardPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date</TableHead>
+                      <TableHead className="hidden sm:table-cell">Date</TableHead>
                       <TableHead>Symbol</TableHead>
                       <TableHead>Direction</TableHead>
-                      <TableHead>Entry</TableHead>
-                      <TableHead>Exit</TableHead>
+                      <TableHead className="hidden md:table-cell">Entry</TableHead>
+                      <TableHead className="hidden md:table-cell">Exit</TableHead>
                       <TableHead>P&L</TableHead>
-                      <TableHead>Strategy</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead className="hidden lg:table-cell">Strategy</TableHead>
+                      <TableHead className="hidden sm:table-cell">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {recentTrades.map((trade) => (
                       <TableRow key={trade.id}>
-                        <TableCell className="text-zinc-300">{new Date(trade.trade_date).toLocaleDateString()}</TableCell>
+                        <TableCell className="hidden sm:table-cell text-zinc-300">{new Date(trade.trade_date).toLocaleDateString()}</TableCell>
                         <TableCell className="font-medium text-zinc-100">{trade.symbol}</TableCell>
                         <TableCell>
                           <Badge variant={trade.direction === "long" ? "default" : "secondary"}>
@@ -267,13 +267,13 @@ export default function DashboardPage() {
                             {trade.direction.toUpperCase()}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-zinc-300">{trade.entry_price}</TableCell>
-                        <TableCell className="text-zinc-300">{trade.exit_price ?? "—"}</TableCell>
+                        <TableCell className="hidden md:table-cell text-zinc-300">{trade.entry_price}</TableCell>
+                        <TableCell className="hidden md:table-cell text-zinc-300">{trade.exit_price ?? "—"}</TableCell>
                         <TableCell className={(trade.profit_loss || 0) >= 0 ? "text-emerald-500" : "text-red-500"}>
                           {(trade.profit_loss || 0) >= 0 ? "+" : ""}${(trade.profit_loss || 0).toLocaleString()}
                         </TableCell>
-                        <TableCell className="text-zinc-300">{trade.strategy ?? "—"}</TableCell>
-                        <TableCell>
+                        <TableCell className="hidden lg:table-cell text-zinc-300">{trade.strategy ?? "—"}</TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           <Badge variant={trade.status === "win" ? "default" : "destructive"}>{trade.status}</Badge>
                         </TableCell>
                       </TableRow>
