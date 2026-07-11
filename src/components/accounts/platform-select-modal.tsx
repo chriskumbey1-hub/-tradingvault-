@@ -31,6 +31,7 @@ const platformIcons: Record<string, string> = {
   tradelocker: "TL",
   ibkr: "IB",
   manual: "MN",
+  exness: "EX",
 };
 
 export function PlatformSelectModal({ open, onOpenChange, onSelect }: PlatformSelectModalProps) {

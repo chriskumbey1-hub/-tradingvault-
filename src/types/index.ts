@@ -18,6 +18,7 @@ export type PlatformType =
   | "coinbase"
   | "kraken"
   | "ibkr"
+  | "exness"
   | "manual";
 
 export type ConnectionStatus =
