@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { toast } from "sonner";
 
 interface Backtest {
   id: string;
@@ -164,14 +165,22 @@ export default function BacktestsPage() {
       setShowCreate(false);
       resetForm();
       fetchBacktests();
+      toast.success("Backtest created");
+    } else {
+      toast.error("Failed to create backtest");
     }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this backtest?")) return;
-    await supabase.from("backtests").delete().eq("id", id);
-    fetchBacktests();
+    const { error } = await supabase.from("backtests").delete().eq("id", id);
+    if (!error) {
+      fetchBacktests();
+      toast.success("Backtest deleted");
+    } else {
+      toast.error("Failed to delete backtest");
+    }
   };
 
   const openEdit = (bt: Backtest) => {
@@ -427,7 +436,7 @@ export default function BacktestsPage() {
             <Button variant="outline" onClick={() => { setShowCreate(false); setEditing(null); }}>Cancel</Button>
             <Button onClick={editing ? async () => {
               setSaving(true);
-              await supabase.from("backtests").update({
+              const { error } = await supabase.from("backtests").update({
                 strategy_name: formData.strategy_name,
                 symbol: formData.symbol,
                 market_type: formData.market_type,
@@ -446,8 +455,13 @@ export default function BacktestsPage() {
                 avg_rr: parseFloat(formData.avg_rr) || null,
                 notes: formData.notes || null,
               }).eq("id", editing.id);
-              setEditing(null);
-              fetchBacktests();
+              if (!error) {
+                setEditing(null);
+                fetchBacktests();
+                toast.success("Backtest updated");
+              } else {
+                toast.error("Failed to update backtest");
+              }
               setSaving(false);
             } : handleCreate} disabled={saving || !formData.strategy_name}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}

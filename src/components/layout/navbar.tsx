@@ -34,6 +34,7 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
         size="icon"
         className="md:hidden h-9 w-9"
         onClick={onMenuToggle}
+        aria-label="Toggle menu"
       >
         <Menu className="h-5 w-5" />
       </Button>
@@ -52,6 +53,7 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
           size="icon"
           className="sm:hidden h-9 w-9"
           onClick={() => setSearchOpen(!searchOpen)}
+          aria-label="Search"
         >
           <Search className="h-4 w-4" />
         </Button>
@@ -72,7 +74,7 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
       )}
 
       <div className="flex items-center gap-1 sm:gap-2">
-        <Button variant="ghost" size="icon" className="relative h-9 w-9">
+        <Button variant="ghost" size="icon" className="relative h-9 w-9" aria-label="Notifications">
           <Bell className="h-4 w-4" />
           <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-medium text-white">
             3
@@ -81,7 +83,7 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full" aria-label="User menu">
               <Avatar className="h-9 w-9">
                 <AvatarImage src={user?.avatar} alt={user?.name} />
                 <AvatarFallback className="bg-zinc-700">

@@ -175,6 +175,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
             variant="ghost"
             size="sm"
             onClick={onToggle}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="w-full justify-center"
           >
             {collapsed ? (

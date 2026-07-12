@@ -17,6 +17,7 @@ import {
   Area,
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -119,7 +120,7 @@ export default function DashboardPage() {
 
   const totalTrades = trades.length;
   const totalProfit = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-  const winCount = trades.filter((t) => t.status === "win").length;
+  const winCount = trades.filter((t) => (t.profit_loss || 0) > 0).length;
   const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
   const grossProfit = trades.filter((t) => (t.profit_loss || 0) > 0).reduce((sum, t) => sum + (t.profit_loss || 0), 0);
   const grossLoss = Math.abs(trades.filter((t) => (t.profit_loss || 0) < 0).reduce((sum, t) => sum + (t.profit_loss || 0), 0));
@@ -230,7 +231,7 @@ export default function DashboardPage() {
                       <Tooltip content={<ChartTooltip />} />
                       <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                         {monthlyData.map((entry, i) => (
-                          <rect key={i} fill={entry.value >= 0 ? "#10b981" : "#ef4444"} />
+                          <Cell key={i} fill={entry.value >= 0 ? "#10b981" : "#ef4444"} />
                         ))}
                       </Bar>
                     </BarChart>

@@ -24,7 +24,12 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { platform, credentials, accountName, accountType, currency } = body;
 
-  const connectionResult = await connectToBroker(platform, credentials);
+  let connectionResult;
+  try {
+    connectionResult = await connectToBroker(platform, credentials);
+  } catch {
+    return NextResponse.json({ error: "Failed to connect to broker. Please try again." }, { status: 500 });
+  }
 
   if (!connectionResult.success) {
     return NextResponse.json({ error: connectionResult.error }, { status: 400 });

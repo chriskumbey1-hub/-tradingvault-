@@ -92,7 +92,33 @@ export default function SettingsPage() {
       return;
     }
 
+    if (!currentPassword) {
+      setPasswordMessage({ type: "error", text: "Current password is required." });
+      setPasswordSaving(false);
+      return;
+    }
+
     const supabase = createClient();
+
+    // Verify current password by attempting re-authentication
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !user.email) {
+      setPasswordMessage({ type: "error", text: "Unable to verify user." });
+      setPasswordSaving(false);
+      return;
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+
+    if (signInError) {
+      setPasswordMessage({ type: "error", text: "Current password is incorrect." });
+      setPasswordSaving(false);
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
       setPasswordMessage({ type: "error", text: error.message });

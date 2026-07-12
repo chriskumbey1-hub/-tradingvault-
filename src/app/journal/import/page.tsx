@@ -157,6 +157,8 @@ export default function ImportCSVPage() {
     let success = 0;
     let errors = 0;
 
+    const validTrades: Record<string, unknown>[] = [];
+
     for (const row of rows) {
       const trade: Record<string, unknown> = { user_id: user.id };
       let valid = true;
@@ -187,9 +189,15 @@ export default function ImportCSVPage() {
       if (!trade.commission) trade.commission = 0;
       if (!trade.fees) trade.fees = 0;
 
-      const { error: insertError } = await supabase.from("trades").insert(trade);
-      if (insertError) errors++;
-      else success++;
+      validTrades.push(trade);
+    }
+
+    const BATCH_SIZE = 50;
+    for (let i = 0; i < validTrades.length; i += BATCH_SIZE) {
+      const batch = validTrades.slice(i, i + BATCH_SIZE);
+      const { error: insertError } = await supabase.from("trades").insert(batch);
+      if (insertError) errors += batch.length;
+      else success += batch.length;
     }
 
     setResult({ success, errors });

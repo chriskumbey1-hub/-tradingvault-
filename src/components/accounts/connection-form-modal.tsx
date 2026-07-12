@@ -47,6 +47,7 @@ export function ConnectionFormModal({
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [serverSearch, setServerSearch] = React.useState("");
   const [showServerDropdown, setShowServerDropdown] = React.useState(false);
+  const [accountType, setAccountType] = React.useState("live");
   const serverInputRef = React.useRef<HTMLDivElement>(null);
   const firstInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -61,6 +62,7 @@ export function ConnectionFormModal({
       setErrors({});
       setServerSearch("");
       setShowPasswords({});
+      setAccountType("live");
       setTimeout(() => firstInputRef.current?.focus(), 100);
     }
   }, [open]);
@@ -119,7 +121,7 @@ export function ConnectionFormModal({
         password: fields["Password"] || fields["API Secret"] || "",
         apiSecret: fields["API Secret"] || "",
       },
-      accountType: "live",
+      accountType,
     });
   };
 
@@ -294,6 +296,23 @@ export function ConnectionFormModal({
               </div>
             );
           })}
+        </div>
+
+        <div className="px-6 pb-2">
+          <div className="space-y-2">
+            <Label className="text-zinc-300">Account Type</Label>
+            <Select value={accountType} onValueChange={setAccountType}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="live">Live</SelectItem>
+                <SelectItem value="demo">Demo</SelectItem>
+                <SelectItem value="prop">Prop Firm</SelectItem>
+                <SelectItem value="paper">Paper Trading</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <DialogFooter className="px-6 pb-6">

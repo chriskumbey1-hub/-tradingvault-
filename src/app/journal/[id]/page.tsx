@@ -140,6 +140,20 @@ export default function TradeDetailsPage() {
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this trade?")) return;
     const supabase = createClient();
+
+    // Delete screenshots from storage first
+    if (screenshots.length > 0) {
+      const filePaths = screenshots
+        .map((url) => {
+          const match = url.match(/trade-screenshots\/(.+?)(\?|$)/);
+          return match ? decodeURIComponent(match[1]) : null;
+        })
+        .filter(Boolean) as string[];
+      if (filePaths.length > 0) {
+        await supabase.storage.from("trade-screenshots").remove(filePaths);
+      }
+    }
+
     const { error } = await supabase.from("trades").delete().eq("id", id);
     if (!error) {
       router.push("/journal");

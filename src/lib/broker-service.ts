@@ -1,6 +1,9 @@
 import crypto from "crypto";
 
-const ENCRYPTION_KEY = process.env.ACCOUNT_ENCRYPTION_KEY || "tradevault-default-key-32-chars-long!!";
+const ENCRYPTION_KEY = process.env.ACCOUNT_ENCRYPTION_KEY;
+if (!ENCRYPTION_KEY) {
+  throw new Error("ACCOUNT_ENCRYPTION_KEY environment variable is required");
+}
 const ALGORITHM = "aes-256-cbc";
 
 function getKey(): Buffer {

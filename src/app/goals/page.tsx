@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 interface Goal {
   id: string;
@@ -107,6 +108,9 @@ export default function GoalsPage() {
       setShowCreate(false);
       resetForm();
       fetchGoals();
+      toast.success("Goal created");
+    } else {
+      toast.error("Failed to create goal");
     }
     setSaving(false);
   };
@@ -134,14 +138,22 @@ export default function GoalsPage() {
       setEditingGoal(null);
       resetForm();
       fetchGoals();
+      toast.success("Goal updated");
+    } else {
+      toast.error("Failed to update goal");
     }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this goal?")) return;
-    await supabase.from("goals").delete().eq("id", id);
-    fetchGoals();
+    const { error } = await supabase.from("goals").delete().eq("id", id);
+    if (!error) {
+      fetchGoals();
+      toast.success("Goal deleted");
+    } else {
+      toast.error("Failed to delete goal");
+    }
   };
 
   const openEdit = (goal: Goal) => {

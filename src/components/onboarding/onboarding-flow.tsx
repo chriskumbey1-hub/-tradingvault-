@@ -51,32 +51,42 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
 
   const handleComplete = async () => {
     setLoading(true);
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    // Update user preferences
-    await supabase.from("user_preferences").upsert({
-      user_id: user.id,
-      currency,
-      timezone,
-      onboarding_completed: true,
-    }, { onConflict: "user_id" });
-
-    // Create account if specified
-    if (accountType !== "manual" && accountName) {
-      await supabase.from("trading_accounts").insert({
+      const { error: prefsError } = await supabase.from("user_preferences").upsert({
         user_id: user.id,
-        account_name: accountName,
-        broker_name: brokerName || accountType,
-        account_type: "live",
-        platform: accountType,
         currency,
-      });
-    }
+        timezone,
+        onboarding_completed: true,
+      }, { onConflict: "user_id" });
 
-    onComplete();
-    setLoading(false);
+      if (prefsError) {
+        setLoading(false);
+        return;
+      }
+
+      if (accountType !== "manual" && accountName) {
+        await supabase.from("trading_accounts").insert({
+          user_id: user.id,
+          account_name: accountName,
+          broker_name: brokerName || accountType,
+          account_type: "live",
+          platform: accountType,
+          currency,
+        });
+      }
+
+      setLoading(false);
+      onComplete();
+    } catch {
+      setLoading(false);
+    }
   };
 
   return (
