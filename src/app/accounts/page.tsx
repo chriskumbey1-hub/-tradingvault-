@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   Plus,
-  Wallet,
+
   RefreshCw,
   MoreHorizontal,
   Pencil,
@@ -20,7 +20,7 @@ import {
   Loader2,
   Search,
   Filter,
-  Download,
+
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Button } from "@/components/ui/button";
@@ -217,6 +217,8 @@ export default function AccountsPage() {
       if (res.ok) {
         toast.success("Account synced");
         fetchAccounts();
+      } else {
+        toast.error("Sync failed");
       }
     } catch {
       toast.error("Sync failed");
@@ -241,6 +243,8 @@ export default function AccountsPage() {
       if (res.ok) {
         toast.success("Account reconnected");
         fetchAccounts();
+      } else {
+        toast.error("Reconnect failed");
       }
     } catch {
       toast.error("Reconnect failed");
@@ -257,6 +261,8 @@ export default function AccountsPage() {
       if (res.ok) {
         toast.success("Account disconnected");
         fetchAccounts();
+      } else {
+        toast.error("Disconnect failed");
       }
     } catch {
       toast.error("Disconnect failed");
@@ -465,7 +471,7 @@ export default function AccountsPage() {
                     <TableHead className="text-zinc-400 font-medium">
                       <button
                         onClick={() => {
-                          setSortField(sortField === "account_name" && sortDir === "asc" ? "account_name" : "account_name");
+                          setSortField("account_name");
                           setSortDir(sortField === "account_name" && sortDir === "desc" ? "asc" : "desc");
                         }}
                         className="flex items-center gap-1 hover:text-zinc-300"
@@ -480,7 +486,7 @@ export default function AccountsPage() {
                     <TableHead className="text-zinc-400 font-medium text-right">
                       <button
                         onClick={() => {
-                          setSortField(sortField === "current_balance" && sortDir === "asc" ? "current_balance" : "current_balance");
+                          setSortField("current_balance");
                           setSortDir(sortField === "current_balance" && sortDir === "desc" ? "asc" : "desc");
                         }}
                         className="flex items-center gap-1 hover:text-zinc-300 ml-auto"
@@ -571,13 +577,14 @@ export default function AccountsPage() {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                aria-label="Account actions"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem onClick={() => handleSync(account.id)}>

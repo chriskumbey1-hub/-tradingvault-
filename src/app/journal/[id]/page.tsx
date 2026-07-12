@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface Trade {
   id: string;
@@ -156,7 +157,10 @@ export default function TradeDetailsPage() {
 
     const { error } = await supabase.from("trades").delete().eq("id", id);
     if (!error) {
+      toast.success("Trade deleted");
       router.push("/journal");
+    } else {
+      toast.error("Failed to delete trade");
     }
   };
 
@@ -212,7 +216,12 @@ export default function TradeDetailsPage() {
       setScreenshots(updated);
 
       const supabase = createClient();
-      await supabase.from("trades").update({ screenshots: updated }).eq("id", id);
+      const { error } = await supabase.from("trades").update({ screenshots: updated }).eq("id", id);
+      if (error) {
+        toast.error("Failed to upload screenshot");
+      } else {
+        toast.success("Screenshot uploaded");
+      }
     }
 
     setUploading(false);
@@ -247,7 +256,12 @@ export default function TradeDetailsPage() {
     const updated = screenshots.filter((_, i) => i !== index);
     setScreenshots(updated);
     const supabase = createClient();
-    await supabase.from("trades").update({ screenshots: updated }).eq("id", id);
+    const { error } = await supabase.from("trades").update({ screenshots: updated }).eq("id", id);
+    if (error) {
+      toast.error("Failed to remove screenshot");
+    } else {
+      toast.success("Screenshot removed");
+    }
   };
 
   const openLightbox = (index: number) => {
@@ -557,6 +571,7 @@ export default function TradeDetailsPage() {
                           e.stopPropagation();
                           removeScreenshot(index);
                         }}
+                        aria-label="Remove screenshot"
                         className="absolute right-1 top-1 rounded-full bg-zinc-900/80 p-1 text-zinc-400 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
                       >
                         <X className="h-3 w-3" />
@@ -642,6 +657,7 @@ export default function TradeDetailsPage() {
                       (prev) => (prev - 1 + screenshots.length) % screenshots.length
                     )
                   }
+                  aria-label="Previous screenshot"
                   className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-zinc-900/80 p-2 text-zinc-400 hover:text-zinc-100"
                 >
                   <ArrowLeft className="h-5 w-5" />
@@ -652,6 +668,7 @@ export default function TradeDetailsPage() {
                       (prev) => (prev + 1) % screenshots.length
                     )
                   }
+                  aria-label="Next screenshot"
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-zinc-900/80 p-2 text-zinc-400 hover:text-zinc-100 rotate-180"
                 >
                   <ArrowLeft className="h-5 w-5" />

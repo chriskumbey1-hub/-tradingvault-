@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface UploadedScreenshot {
   url: string;
@@ -246,6 +247,7 @@ export default function EditTradePage() {
       return;
     }
 
+    toast.success("Trade updated");
     router.push(`/journal/${id}`);
   };
 
@@ -452,7 +454,7 @@ export default function EditTradePage() {
                     {screenshots.map((screenshot, index) => (
                       <div key={index} className="group relative overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800">
                         <img src={screenshot.url} alt={screenshot.name} className="aspect-square w-full object-cover" />
-                        <button type="button" onClick={() => removeScreenshot(index)} className="absolute right-1 top-1 rounded-full bg-zinc-900/80 p-1 text-zinc-400 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100">
+                        <button type="button" onClick={() => removeScreenshot(index)} aria-label="Remove screenshot" className="absolute right-1 top-1 rounded-full bg-zinc-900/80 p-1 text-zinc-400 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100">
                           <X className="h-3 w-3" />
                         </button>
                       </div>

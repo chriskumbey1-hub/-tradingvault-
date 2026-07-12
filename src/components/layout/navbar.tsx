@@ -45,6 +45,7 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
           <input
             type="search"
             placeholder="Search trades..."
+            aria-label="Search trades"
             className="w-full rounded-lg border border-zinc-800 bg-zinc-800/50 py-2 pl-9 pr-4 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
@@ -66,6 +67,7 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
             <input
               type="search"
               placeholder="Search trades..."
+              aria-label="Search trades"
               autoFocus
               className="w-full rounded-lg border border-zinc-800 bg-zinc-800/50 py-2 pl-9 pr-4 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
@@ -76,9 +78,6 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
       <div className="flex items-center gap-1 sm:gap-2">
         <Button variant="ghost" size="icon" className="relative h-9 w-9" aria-label="Notifications">
           <Bell className="h-4 w-4" />
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-medium text-white">
-            3
-          </span>
         </Button>
 
         <DropdownMenu>

@@ -44,7 +44,7 @@ export default function CalendarPage() {
         if (!grouped[t.trade_date]) {
           grouped[t.trade_date] = { pnl: 0, trades: 0 };
         }
-        grouped[t.trade_date].pnl += t.profit_loss || 0;
+        grouped[t.trade_date].pnl += t.profit_loss ?? 0;
         grouped[t.trade_date].trades++;
       });
 
@@ -124,14 +124,14 @@ export default function CalendarPage() {
           <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <Button variant="ghost" size="icon" onClick={prevMonth}>
+                <Button variant="ghost" size="icon" onClick={prevMonth} aria-label="Previous month">
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <CardTitle className="text-lg text-zinc-100">
                   {monthNames[currentDate.getMonth()]}{" "}
                   {currentDate.getFullYear()}
                 </CardTitle>
-                <Button variant="ghost" size="icon" onClick={nextMonth}>
+                <Button variant="ghost" size="icon" onClick={nextMonth} aria-label="Next month">
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

@@ -32,17 +32,23 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+      } else {
+        const returnTo = searchParams.get("returnTo");
+        const safeReturnTo = returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/dashboard";
+        router.push(safeReturnTo);
+      }
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
       setLoading(false);
-    } else {
-      const returnTo = searchParams.get("returnTo") || "/dashboard";
-      router.push(returnTo);
     }
   };
 

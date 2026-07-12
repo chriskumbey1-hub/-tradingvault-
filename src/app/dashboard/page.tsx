@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -24,6 +23,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { StatsCard } from "@/components/ui/stats-card";
@@ -70,7 +70,7 @@ function StatsSkeleton() {
   );
 }
 
-function ChartTooltip({ active, payload, label }: any) {
+function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 shadow-xl">
@@ -110,7 +110,9 @@ export default function DashboardPage() {
         .select("*")
         .order("trade_date", { ascending: false });
 
-      if (!error && data) {
+      if (error) {
+        toast.error("Failed to load trades");
+      } else if (data) {
         setTrades(data);
       }
       setLoading(false);
@@ -119,11 +121,11 @@ export default function DashboardPage() {
   }, []);
 
   const totalTrades = trades.length;
-  const totalProfit = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-  const winCount = trades.filter((t) => (t.profit_loss || 0) > 0).length;
+  const totalProfit = trades.reduce((sum, t) => sum + (t.profit_loss ?? 0), 0);
+  const winCount = trades.filter((t) => (t.profit_loss ?? 0) > 0).length;
   const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
-  const grossProfit = trades.filter((t) => (t.profit_loss || 0) > 0).reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-  const grossLoss = Math.abs(trades.filter((t) => (t.profit_loss || 0) < 0).reduce((sum, t) => sum + (t.profit_loss || 0), 0));
+  const grossProfit = trades.filter((t) => (t.profit_loss ?? 0) > 0).reduce((sum, t) => sum + (t.profit_loss ?? 0), 0);
+  const grossLoss = Math.abs(trades.filter((t) => (t.profit_loss ?? 0) < 0).reduce((sum, t) => sum + (t.profit_loss ?? 0), 0));
   const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? Infinity : 0;
   const recentTrades = trades.slice(0, 10);
 
@@ -131,7 +133,7 @@ export default function DashboardPage() {
     const sorted = [...trades].sort((a, b) => a.trade_date.localeCompare(b.trade_date));
     let cumulative = 0;
     return sorted.map((t, i) => {
-      cumulative += t.profit_loss || 0;
+      cumulative += t.profit_loss ?? 0;
       return { name: `Trade ${i + 1}`, value: cumulative };
     });
   }, [trades]);
@@ -140,7 +142,7 @@ export default function DashboardPage() {
     const grouped: Record<string, number> = {};
     trades.forEach((t) => {
       const month = t.trade_date.substring(0, 7);
-      grouped[month] = (grouped[month] || 0) + (t.profit_loss || 0);
+      grouped[month] = (grouped[month] || 0) + (t.profit_loss ?? 0);
     });
     return Object.entries(grouped)
       .sort(([a], [b]) => a.localeCompare(b))
@@ -288,8 +290,8 @@ export default function DashboardPage() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-zinc-300">{trade.entry_price}</TableCell>
                         <TableCell className="hidden md:table-cell text-zinc-300">{trade.exit_price ?? "—"}</TableCell>
-                        <TableCell className={(trade.profit_loss || 0) >= 0 ? "text-emerald-500" : "text-red-500"}>
-                          {(trade.profit_loss || 0) >= 0 ? "+" : ""}${(trade.profit_loss || 0).toLocaleString()}
+                        <TableCell className={(trade.profit_loss ?? 0) >= 0 ? "text-emerald-500" : "text-red-500"}>
+                          {(trade.profit_loss ?? 0) >= 0 ? "+" : ""}${(trade.profit_loss ?? 0).toLocaleString()}
                         </TableCell>
                         <TableCell className="hidden lg:table-cell text-zinc-300">{trade.strategy ?? "—"}</TableCell>
                         <TableCell className="hidden sm:table-cell">

@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface UploadedScreenshot {
   url: string;
@@ -233,6 +234,7 @@ export default function NewTradePage() {
       return;
     }
 
+    toast.success("Trade created");
     router.push("/journal");
   };
 
@@ -648,6 +650,7 @@ export default function NewTradePage() {
                         <button
                           type="button"
                           onClick={() => removeScreenshot(index)}
+                          aria-label="Remove screenshot"
                           className="absolute right-1 top-1 rounded-full bg-zinc-900/80 p-1 text-zinc-400 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
                         >
                           <X className="h-3 w-3" />

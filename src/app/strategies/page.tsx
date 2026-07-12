@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 
 interface Strategy {
@@ -53,28 +54,33 @@ export default function StrategiesPage() {
   const [submitting, setSubmitting] = React.useState(false);
 
   const fetchData = async () => {
-    const supabase = createClient();
-    const { data: strats } = await supabase
-      .from("strategies")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setStrategies(strats || []);
+    try {
+      const supabase = createClient();
+      const { data: strats } = await supabase
+        .from("strategies")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setStrategies(strats || []);
 
-    const { data: trades } = await supabase
-      .from("trades")
-      .select("strategy, profit_loss");
+      const { data: trades } = await supabase
+        .from("trades")
+        .select("strategy, profit_loss");
 
-    const stats: Record<string, StrategyStats> = {};
-    (trades || []).forEach((t: { strategy: string; profit_loss: number }) => {
-      const name = t.strategy || "Untyped";
-      if (!stats[name]) stats[name] = { trades: 0, wins: 0, pnl: 0 };
-      stats[name].trades++;
-      if ((t.profit_loss || 0) > 0) stats[name].wins++;
-      stats[name].pnl += t.profit_loss || 0;
-    });
+      const stats: Record<string, StrategyStats> = {};
+      (trades || []).forEach((t: { strategy: string; profit_loss: number }) => {
+        const name = t.strategy || "Untyped";
+        if (!stats[name]) stats[name] = { trades: 0, wins: 0, pnl: 0 };
+        stats[name].trades++;
+        if ((t.profit_loss ?? 0) > 0) stats[name].wins++;
+        stats[name].pnl += t.profit_loss ?? 0;
+      });
 
-    setStrategyStats(stats);
-    setLoading(false);
+      setStrategyStats(stats);
+    } catch {
+      toast.error("Failed to load strategies");
+    } finally {
+      setLoading(false);
+    }
   };
 
   React.useEffect(() => {
@@ -108,12 +114,14 @@ export default function StrategiesPage() {
         .from("strategies")
         .update({ strategy_name: form.strategy_name, description: form.description })
         .eq("id", editStrategy.id);
+      toast.success("Strategy updated");
     } else {
       await supabase.from("strategies").insert({
         user_id: user.id,
         strategy_name: form.strategy_name,
         description: form.description,
       });
+      toast.success("Strategy created");
     }
 
     setSubmitting(false);
@@ -125,6 +133,7 @@ export default function StrategiesPage() {
     if (!deleteId) return;
     const supabase = createClient();
     await supabase.from("strategies").delete().eq("id", deleteId);
+    toast.success("Strategy deleted");
     setDeleteId(null);
     fetchData();
   };
@@ -189,7 +198,7 @@ export default function StrategiesPage() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Strategy actions">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -281,7 +290,7 @@ export default function StrategiesPage() {
               <Button variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} disabled={submitting}>
+              <Button onClick={handleSubmit} disabled={submitting || !form.strategy_name.trim()}>
                 {submitting ? "Saving..." : editStrategy ? "Save Changes" : "Add Strategy"}
               </Button>
             </DialogFooter>

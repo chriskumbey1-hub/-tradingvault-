@@ -134,7 +134,10 @@ export default function BacktestsPage() {
   const handleCreate = async () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setSaving(false);
+      return;
+    }
 
     const initial = parseFloat(formData.initial_balance) || 10000;
     const final = parseFloat(formData.final_balance) || initial;
@@ -152,11 +155,11 @@ export default function BacktestsPage() {
       total_trades: parseInt(formData.total_trades) || 0,
       winning_trades: parseInt(formData.winning_trades) || 0,
       losing_trades: parseInt(formData.losing_trades) || 0,
-      win_rate: parseFloat(formData.win_rate) || null,
-      profit_factor: parseFloat(formData.profit_factor) || null,
-      max_drawdown: parseFloat(formData.max_drawdown) || null,
-      sharpe_ratio: parseFloat(formData.sharpe_ratio) || null,
-      avg_rr: parseFloat(formData.avg_rr) || null,
+      win_rate: isNaN(parseFloat(formData.win_rate)) ? null : parseFloat(formData.win_rate),
+      profit_factor: isNaN(parseFloat(formData.profit_factor)) ? null : parseFloat(formData.profit_factor),
+      max_drawdown: isNaN(parseFloat(formData.max_drawdown)) ? null : parseFloat(formData.max_drawdown),
+      sharpe_ratio: isNaN(parseFloat(formData.sharpe_ratio)) ? null : parseFloat(formData.sharpe_ratio),
+      avg_rr: isNaN(parseFloat(formData.avg_rr)) ? null : parseFloat(formData.avg_rr),
       notes: formData.notes || null,
       equity_curve: [],
     });
@@ -268,10 +271,10 @@ export default function BacktestsPage() {
                           <p className="text-xs text-zinc-500">{bt.symbol} • {bt.timeframe}</p>
                         </div>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(bt)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(bt)} aria-label="Edit backtest">
                             <Edit2 className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400" onClick={() => handleDelete(bt.id)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400" onClick={() => handleDelete(bt.id)} aria-label="Delete backtest">
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
@@ -444,15 +447,15 @@ export default function BacktestsPage() {
                 start_date: formData.start_date,
                 end_date: formData.end_date,
                 initial_balance: parseFloat(formData.initial_balance) || 10000,
-                final_balance: parseFloat(formData.final_balance) || null,
+                final_balance: isNaN(parseFloat(formData.final_balance)) ? null : parseFloat(formData.final_balance),
                 total_trades: parseInt(formData.total_trades) || 0,
                 winning_trades: parseInt(formData.winning_trades) || 0,
                 losing_trades: parseInt(formData.losing_trades) || 0,
-                win_rate: parseFloat(formData.win_rate) || null,
-                profit_factor: parseFloat(formData.profit_factor) || null,
-                max_drawdown: parseFloat(formData.max_drawdown) || null,
-                sharpe_ratio: parseFloat(formData.sharpe_ratio) || null,
-                avg_rr: parseFloat(formData.avg_rr) || null,
+                win_rate: isNaN(parseFloat(formData.win_rate)) ? null : parseFloat(formData.win_rate),
+                profit_factor: isNaN(parseFloat(formData.profit_factor)) ? null : parseFloat(formData.profit_factor),
+                max_drawdown: isNaN(parseFloat(formData.max_drawdown)) ? null : parseFloat(formData.max_drawdown),
+                sharpe_ratio: isNaN(parseFloat(formData.sharpe_ratio)) ? null : parseFloat(formData.sharpe_ratio),
+                avg_rr: isNaN(parseFloat(formData.avg_rr)) ? null : parseFloat(formData.avg_rr),
                 notes: formData.notes || null,
               }).eq("id", editing.id);
               if (!error) {

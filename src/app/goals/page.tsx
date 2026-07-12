@@ -90,14 +90,24 @@ export default function GoalsPage() {
   const handleCreate = async () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setSaving(false);
+      return;
+    }
+
+    const targetVal = parseFloat(formData.target_value);
+    if (isNaN(targetVal) || targetVal <= 0) {
+      toast.error("Please enter a valid target value");
+      setSaving(false);
+      return;
+    }
 
     const { error } = await supabase.from("goals").insert({
       user_id: user.id,
       title: formData.title,
       description: formData.description || null,
       goal_type: formData.goal_type,
-      target_value: parseFloat(formData.target_value),
+      target_value: targetVal,
       current_value: parseFloat(formData.current_value) || 0,
       unit: formData.unit,
       start_date: formData.start_date,
@@ -119,18 +129,26 @@ export default function GoalsPage() {
     if (!editingGoal) return;
     setSaving(true);
 
+    const targetVal = parseFloat(formData.target_value);
+    const currentVal = parseFloat(formData.current_value) || 0;
+    if (isNaN(targetVal) || targetVal <= 0) {
+      toast.error("Please enter a valid target value");
+      setSaving(false);
+      return;
+    }
+
     const { error } = await supabase
       .from("goals")
       .update({
         title: formData.title,
         description: formData.description || null,
         goal_type: formData.goal_type,
-        target_value: parseFloat(formData.target_value),
-        current_value: parseFloat(formData.current_value) || 0,
+        target_value: targetVal,
+        current_value: currentVal,
         unit: formData.unit,
         start_date: formData.start_date,
         end_date: formData.end_date,
-        status: parseFloat(formData.current_value) >= parseFloat(formData.target_value) ? "completed" : "active",
+        status: currentVal >= targetVal ? "completed" : "active",
       })
       .eq("id", editingGoal.id);
 
@@ -249,10 +267,10 @@ export default function GoalsPage() {
                                 <p className="text-xs text-zinc-500">{goalTypeLabels[goal.goal_type]}</p>
                               </div>
                               <div className="flex gap-1">
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(goal)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(goal)} aria-label="Edit goal">
                                   <Edit2 className="h-3 w-3" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400" onClick={() => handleDelete(goal.id)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400" onClick={() => handleDelete(goal.id)} aria-label="Delete goal">
                                   <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>
@@ -396,7 +414,7 @@ export default function GoalsPage() {
             <Button variant="outline" onClick={() => { setShowCreate(false); setEditingGoal(null); }}>
               Cancel
             </Button>
-            <Button onClick={editingGoal ? handleUpdate : handleCreate} disabled={saving || !formData.title}>
+            <Button onClick={editingGoal ? handleUpdate : handleCreate} disabled={saving || !formData.title || !formData.target_value}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {editingGoal ? "Update" : "Create"}
             </Button>

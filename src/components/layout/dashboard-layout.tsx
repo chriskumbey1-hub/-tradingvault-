@@ -19,7 +19,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const supabase = React.useMemo(() => createClient(), []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Sign out even if Supabase call fails
+    }
     router.push("/auth/login");
   };
 
@@ -42,6 +46,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div
             className="fixed inset-0 bg-black/60"
             onClick={() => setMobileOpen(false)}
+            onKeyDown={(e) => { if (e.key === "Escape") setMobileOpen(false); }}
+            tabIndex={-1}
           />
           <div className="fixed inset-y-0 left-0 z-50 w-64">
             <Sidebar collapsed={false} onToggle={() => setMobileOpen(false)} />

@@ -4,7 +4,6 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import {
   TrendingUp,
-  TrendingDown,
   BarChart3,
   Target,
   Activity,
@@ -75,17 +74,17 @@ export default function AnalyticsPage() {
     if (trades.length === 0) return null;
 
     const totalTrades = trades.length;
-    const wins = trades.filter((t) => (t.profit_loss || 0) > 0);
-    const losses = trades.filter((t) => (t.profit_loss || 0) < 0);
+    const wins = trades.filter((t) => (t.profit_loss ?? 0) > 0);
+    const losses = trades.filter((t) => (t.profit_loss ?? 0) < 0);
     const winRate = totalTrades > 0 ? (wins.length / totalTrades) * 100 : 0;
 
-    const grossProfit = wins.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const grossProfit = wins.reduce((sum, t) => sum + (t.profit_loss ?? 0), 0);
     const grossLoss = Math.abs(
-      losses.reduce((sum, t) => sum + (t.profit_loss || 0), 0)
+      losses.reduce((sum, t) => sum + (t.profit_loss ?? 0), 0)
     );
     const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? Infinity : 0;
 
-    const totalPnl = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const totalPnl = trades.reduce((sum, t) => sum + (t.profit_loss ?? 0), 0);
     const expectancy = totalTrades > 0 ? totalPnl / totalTrades : 0;
 
     const rrTrades = trades.filter(
@@ -123,8 +122,8 @@ export default function AnalyticsPage() {
         grouped[name] = { trades: 0, wins: 0, pnl: 0, rrSum: 0, rrCount: 0 };
       }
       grouped[name].trades++;
-      if ((t.profit_loss || 0) > 0) grouped[name].wins++;
-      grouped[name].pnl += t.profit_loss || 0;
+      if ((t.profit_loss ?? 0) > 0) grouped[name].wins++;
+      grouped[name].pnl += t.profit_loss ?? 0;
       if (t.stop_loss && t.take_profit && t.entry_price) {
         const risk = Math.abs(t.entry_price - t.stop_loss);
         const reward = Math.abs(t.take_profit - t.entry_price);
@@ -155,8 +154,8 @@ export default function AnalyticsPage() {
       const dayIdx = d.getDay();
       if (!grouped[dayIdx]) grouped[dayIdx] = { trades: 0, wins: 0, pnl: 0 };
       grouped[dayIdx].trades++;
-      if ((t.profit_loss || 0) > 0) grouped[dayIdx].wins++;
-      grouped[dayIdx].pnl += t.profit_loss || 0;
+      if ((t.profit_loss ?? 0) > 0) grouped[dayIdx].wins++;
+      grouped[dayIdx].pnl += t.profit_loss ?? 0;
     });
 
     return [1, 2, 3, 4, 5].map((idx) => ({
@@ -177,8 +176,8 @@ export default function AnalyticsPage() {
       const dateStr = t.trade_date;
       if (!grouped[dateStr]) grouped[dateStr] = { trades: 0, wins: 0, pnl: 0 };
       grouped[dateStr].trades++;
-      if ((t.profit_loss || 0) > 0) grouped[dateStr].wins++;
-      grouped[dateStr].pnl += t.profit_loss || 0;
+      if ((t.profit_loss ?? 0) > 0) grouped[dateStr].wins++;
+      grouped[dateStr].pnl += t.profit_loss ?? 0;
     });
 
     const sorted = Object.entries(grouped)
@@ -197,7 +196,7 @@ export default function AnalyticsPage() {
     if (trades.length === 0) return [];
     let cumulative = 0;
     return trades.map((t) => {
-      cumulative += t.profit_loss || 0;
+      cumulative += t.profit_loss ?? 0;
       return cumulative;
     });
   }, [trades]);

@@ -43,6 +43,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 interface Trade {
   id: string;
@@ -110,6 +111,9 @@ export default function JournalPage() {
     const { error } = await supabase.from("trades").delete().eq("id", id);
     if (!error) {
       setTrades((prev) => prev.filter((t) => t.id !== id));
+      toast.success("Trade deleted");
+    } else {
+      toast.error("Failed to delete trade");
     }
   };
 
@@ -272,7 +276,7 @@ export default function JournalPage() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Trade actions">
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
