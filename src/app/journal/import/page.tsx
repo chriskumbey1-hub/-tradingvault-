@@ -70,14 +70,60 @@ export default function ImportCSVPage() {
   const [error, setError] = React.useState("");
 
   const parseCSV = (text: string) => {
-    const lines = text.trim().split("\n");
+    const lines: string[] = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '"') {
+        if (inQuotes && i + 1 < text.length && text[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (ch === "\n" && !inQuotes) {
+        lines.push(current);
+        current = "";
+      } else {
+        current += ch;
+      }
+    }
+    if (current.trim()) lines.push(current);
+
     if (lines.length < 2) {
       setError("CSV must have at least a header row and one data row.");
       return;
     }
-    const hdrs = lines[0].split(",").map((h) => h.trim().replace(/^"|"$/g, ""));
+
+    const splitRow = (line: string): string[] => {
+      const cells: string[] = [];
+      let cell = "";
+      let inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQ && i + 1 < line.length && line[i + 1] === '"') {
+            cell += '"';
+            i++;
+          } else {
+            inQ = !inQ;
+          }
+        } else if (ch === "," && !inQ) {
+          cells.push(cell.trim());
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+      cells.push(cell.trim());
+      return cells;
+    };
+
+    const hdrs = splitRow(lines[0]).map((h) => h.replace(/^"|"$/g, ""));
     const data = lines.slice(1).map((line) =>
-      line.split(",").map((cell) => cell.trim().replace(/^"|"$/g, ""))
+      splitRow(line).map((cell) => cell.replace(/^"|"$/g, ""))
     );
     setHeaders(hdrs);
     setRows(data);
@@ -137,7 +183,7 @@ export default function ImportCSVPage() {
         continue;
       }
 
-      if (!trade.status) trade.status = "win";
+      if (!trade.status) trade.status = "breakeven";
       if (!trade.commission) trade.commission = 0;
       if (!trade.fees) trade.fees = 0;
 

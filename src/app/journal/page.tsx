@@ -284,7 +284,7 @@ export default function JournalPage() {
                                   </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  onClick={() => router.push(`/journal/${trade.id}`)}
+                                  onClick={() => router.push(`/journal/${trade.id}/edit`)}
                                 >
                                   <Pencil className="mr-2 h-4 w-4" />
                                   Edit

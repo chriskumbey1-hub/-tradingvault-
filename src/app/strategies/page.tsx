@@ -14,7 +14,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,9 +28,8 @@ import { createClient } from "@/lib/supabase/client";
 
 interface Strategy {
   id: string;
-  name: string;
+  strategy_name: string;
   description: string;
-  rules: string;
   user_id: string;
   created_at: string;
 }
@@ -51,7 +49,7 @@ export default function StrategiesPage() {
   const [open, setOpen] = React.useState(false);
   const [editStrategy, setEditStrategy] = React.useState<Strategy | null>(null);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
-  const [form, setForm] = React.useState({ name: "", description: "", rules: "" });
+  const [form, setForm] = React.useState({ strategy_name: "", description: "" });
   const [submitting, setSubmitting] = React.useState(false);
 
   const fetchData = async () => {
@@ -85,22 +83,21 @@ export default function StrategiesPage() {
 
   const openAddDialog = () => {
     setEditStrategy(null);
-    setForm({ name: "", description: "", rules: "" });
+    setForm({ strategy_name: "", description: "" });
     setOpen(true);
   };
 
   const openEditDialog = (strategy: Strategy) => {
     setEditStrategy(strategy);
     setForm({
-      name: strategy.name,
+      strategy_name: strategy.strategy_name,
       description: strategy.description || "",
-      rules: strategy.rules || "",
     });
     setOpen(true);
   };
 
   const handleSubmit = async () => {
-    if (!form.name) return;
+    if (!form.strategy_name) return;
     setSubmitting(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -109,14 +106,13 @@ export default function StrategiesPage() {
     if (editStrategy) {
       await supabase
         .from("strategies")
-        .update({ name: form.name, description: form.description, rules: form.rules })
+        .update({ strategy_name: form.strategy_name, description: form.description })
         .eq("id", editStrategy.id);
     } else {
       await supabase.from("strategies").insert({
         user_id: user.id,
-        name: form.name,
+        strategy_name: form.strategy_name,
         description: form.description,
-        rules: form.rules,
       });
     }
 
@@ -172,7 +168,7 @@ export default function StrategiesPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {strategies.map((strategy, index) => {
-              const stats = strategyStats[strategy.name] || { trades: 0, wins: 0, pnl: 0 };
+              const stats = strategyStats[strategy.strategy_name] || { trades: 0, wins: 0, pnl: 0 };
               const winRate = stats.trades > 0 ? Math.round((stats.wins / stats.trades) * 100) : 0;
               return (
                 <motion.div
@@ -188,7 +184,7 @@ export default function StrategiesPage() {
                           <Target className="h-5 w-5 text-purple-500" />
                         </div>
                         <CardTitle className="text-base text-zinc-100">
-                          {strategy.name}
+                          {strategy.strategy_name}
                         </CardTitle>
                       </div>
                       <DropdownMenu>
@@ -267,8 +263,8 @@ export default function StrategiesPage() {
                 <Label className="text-zinc-300">Strategy Name</Label>
                 <Input
                   placeholder="ICT, Breakout, Scalping"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  value={form.strategy_name}
+                  onChange={(e) => setForm({ ...form, strategy_name: e.target.value })}
                 />
               </div>
               <div className="space-y-2">

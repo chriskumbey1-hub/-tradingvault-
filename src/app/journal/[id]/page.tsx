@@ -45,6 +45,7 @@ interface Trade {
   emotion: string | null;
   confidence_level: number | null;
   notes: string | null;
+  lessons_learned: string | null;
   status: string;
   trade_date: string;
   screenshots: string[] | null;
@@ -272,7 +273,7 @@ export default function TradeDetailsPage() {
     );
   }
 
-  const netPnl = (trade.profit_loss || 0) - (trade.commission || 0) - (trade.fees || 0);
+  const netPnl = trade.profit_loss || 0;
 
   return (
     <DashboardLayout>
@@ -319,7 +320,7 @@ export default function TradeDetailsPage() {
               variant="outline"
               size="sm"
               className="gap-2"
-              onClick={() => router.push(`/journal/${trade.id}`)}
+              onClick={() => router.push(`/journal/${trade.id}/edit`)}
             >
               <Pencil className="h-4 w-4" />
               Edit
@@ -498,6 +499,15 @@ export default function TradeDetailsPage() {
               <p className="whitespace-pre-wrap text-zinc-300">
                 {trade.notes || "No notes added."}
               </p>
+              {trade.lessons_learned && (
+                <>
+                  <Separator className="my-4" />
+                  <h4 className="mb-2 text-sm font-medium text-zinc-400">Lessons Learned</h4>
+                  <p className="whitespace-pre-wrap text-zinc-300">
+                    {trade.lessons_learned}
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </motion.div>

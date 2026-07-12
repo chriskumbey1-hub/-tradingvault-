@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { TrendingUp, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { TrendingUp, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [sent, setSent] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +46,8 @@ export default function SignupPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/auth/login");
+      setLoading(false);
+      setSent(true);
     }
   };
 
@@ -76,12 +78,24 @@ export default function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {error && (
-              <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
-                {error}
+            {sent ? (
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10">
+                  <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                </div>
+                <p className="text-lg font-medium text-zinc-100">Check your email</p>
+                <p className="mt-2 text-sm text-zinc-400">
+                  We&apos;ve sent a confirmation link to <span className="text-zinc-300">{email}</span>.
+                  Click the link to verify your account and start trading.
+                </p>
+                <Button variant="outline" className="mt-6 w-full" asChild>
+                  <Link href="/auth/login">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to login
+                  </Link>
+                </Button>
               </div>
-            )}
-
+            ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-zinc-300">
@@ -153,7 +167,9 @@ export default function SignupPage() {
                 {loading ? "Creating account..." : "Create account"}
               </Button>
             </form>
+            )}
 
+            {!sent && (
             <p className="mt-6 text-center text-sm text-zinc-400">
               Already have an account?{" "}
               <Link
@@ -163,6 +179,7 @@ export default function SignupPage() {
                 Sign in
               </Link>
             </p>
+            )}
           </CardContent>
         </Card>
       </motion.div>

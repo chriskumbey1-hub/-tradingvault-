@@ -186,7 +186,13 @@ export default function NewTradePage() {
     let profitLoss = formData.profit_loss ? parseFloat(formData.profit_loss) : null;
 
     if (profitLoss === null && exitPrice !== null && !isNaN(exitPrice) && !isNaN(lotSize)) {
-      profitLoss = (exitPrice - entryPrice) * lotSize * 100000;
+      let multiplier = 1;
+      if (formData.market_type === "forex") {
+        multiplier = 100000;
+      } else if (formData.market_type === "indices" || formData.market_type === "commodities") {
+        multiplier = 100;
+      }
+      profitLoss = (exitPrice - entryPrice) * lotSize * multiplier;
     }
 
     const commission = parseFloat(formData.commission) || 0;
