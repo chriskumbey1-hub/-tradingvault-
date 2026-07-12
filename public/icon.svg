@@ -6,6 +6,6 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <text x="256" y="310" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="220" fill="white" text-anchor="middle" letter-spacing="-10">TV</text>
-  <rect x="120" y="340" width="272" height="6" rx="3" fill="rgba(255,255,255,0.4)"/>
+  <path d="M120 340 L210 220 L290 290 L392 160" fill="none" stroke="white" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M320 160 L392 160 L392 232" fill="none" stroke="white" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
