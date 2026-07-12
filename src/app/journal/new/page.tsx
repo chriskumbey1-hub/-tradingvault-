@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { TagInput } from "@/components/ui/tag-input";
 import {
   Select,
   SelectContent,
@@ -35,6 +36,7 @@ export default function NewTradePage() {
   const [uploading, setUploading] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [dragOver, setDragOver] = React.useState(false);
+  const [tags, setTags] = React.useState<string[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [formData, setFormData] = React.useState({
     trade_date: new Date().toISOString().split("T")[0],
@@ -55,6 +57,7 @@ export default function NewTradePage() {
     emotion: "",
     confidence_level: "",
     notes: "",
+    lessons_learned: "",
     status: "win",
   });
 
@@ -209,6 +212,8 @@ export default function NewTradePage() {
       emotion: formData.emotion || null,
       confidence_level: formData.confidence_level ? parseInt(formData.confidence_level) : null,
       notes: formData.notes || null,
+      lessons_learned: formData.lessons_learned || null,
+      tags: tags,
       status: formData.status,
       trade_date: formData.trade_date,
       screenshots: screenshots.map((s) => s.url),
@@ -580,6 +585,29 @@ export default function NewTradePage() {
                     placeholder="What did you learn? What went well? What could be improved?"
                     rows={4}
                     value={formData.notes}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-zinc-300">Tags</Label>
+                  <TagInput
+                    tags={tags}
+                    onChange={setTags}
+                    placeholder="e.g. london-open, breakout, news-trade"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="lessons_learned" className="text-zinc-300">
+                    Lessons Learned
+                  </Label>
+                  <Textarea
+                    id="lessons_learned"
+                    name="lessons_learned"
+                    placeholder="What key takeaway will you remember for next time?"
+                    rows={3}
+                    value={formData.lessons_learned}
                     onChange={handleChange}
                   />
                 </div>

@@ -16,6 +16,8 @@ import {
   ChevronRight,
   TrendingUp,
   Calculator,
+  Award,
+  FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,6 +42,8 @@ const navigation = [
   { name: "Accounts", href: "/accounts", icon: Wallet },
   { name: "Strategies", href: "/strategies", icon: Target },
   { name: "Calculators", href: "/calculators", icon: Calculator },
+  { name: "Goals", href: "/goals", icon: Award },
+  { name: "Backtests", href: "/backtests", icon: FlaskConical },
 ];
 
 const bottomNav = [

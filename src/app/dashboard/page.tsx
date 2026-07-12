@@ -38,6 +38,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 
 interface Trade {
   id: string;
@@ -83,10 +84,26 @@ function ChartTooltip({ active, payload, label }: any) {
 export default function DashboardPage() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     async function fetchTrades() {
       const supabase = createClient();
+      
+      // Check onboarding status
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: prefs } = await supabase
+          .from("user_preferences")
+          .select("onboarding_completed")
+          .eq("user_id", user.id)
+          .single();
+        
+        if (prefs && !prefs.onboarding_completed) {
+          setShowOnboarding(true);
+        }
+      }
+
       const { data, error } = await supabase
         .from("trades")
         .select("*")
@@ -135,6 +152,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
+      {showOnboarding && <OnboardingFlow onComplete={() => setShowOnboarding(false)} />}
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-zinc-100">Dashboard</h1>

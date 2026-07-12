@@ -21,8 +21,10 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createClient } from "@/lib/supabase/client";
+import { useTheme } from "@/components/providers/theme-provider";
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [passwordSaving, setPasswordSaving] = React.useState(false);
@@ -270,13 +272,22 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-zinc-100">
-                        Dark Mode
+                        Theme
                       </p>
                       <p className="text-sm text-zinc-400">
-                        Use dark theme across the application
+                        Choose your preferred color theme
                       </p>
                     </div>
-                    <Switch checked />
+                    <Select value={theme} onValueChange={(v) => setTheme(v as "dark" | "light" | "system")}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dark">Dark</SelectItem>
+                        <SelectItem value="light">Light</SelectItem>
+                        <SelectItem value="system">System</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
