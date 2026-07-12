@@ -128,3 +128,6 @@ CREATE TRIGGER on_auth_user_created
 
 -- 9. Add RLS policy for user_preferences delete
 CREATE POLICY "Users can delete their own preferences" ON user_preferences FOR DELETE USING (auth.uid() = user_id);
+
+-- 10. Add missing UPDATE policy for tags table
+CREATE POLICY "Users can update their own tags" ON tags FOR UPDATE USING (auth.uid() = user_id);

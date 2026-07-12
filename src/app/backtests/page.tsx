@@ -2,13 +2,13 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Plus, FlaskConical, Trash2, Edit2, TrendingUp, TrendingDown, Minus, Loader2, BarChart3 } from "lucide-react";
+import { Plus, FlaskConical, Trash2, Edit2, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -404,7 +404,7 @@ export default function BacktestsPage() {
                 Auto-calculate Win Rate & PF
               </Button>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label className="text-zinc-300">Win Rate %</Label>
                 <Input type="number" step="0.1" value={formData.win_rate} onChange={(e) => setFormData({ ...formData, win_rate: e.target.value })} />
@@ -412,6 +412,10 @@ export default function BacktestsPage() {
               <div className="space-y-2">
                 <Label className="text-zinc-300">Profit Factor</Label>
                 <Input type="number" step="0.01" value={formData.profit_factor} onChange={(e) => setFormData({ ...formData, profit_factor: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-zinc-300">Avg R:R</Label>
+                <Input type="number" step="0.01" value={formData.avg_rr} onChange={(e) => setFormData({ ...formData, avg_rr: e.target.value })} placeholder="2.0" />
               </div>
             </div>
             <div className="space-y-2">

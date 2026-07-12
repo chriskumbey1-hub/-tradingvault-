@@ -84,7 +84,7 @@ export type TradeStatus = "win" | "loss" | "breakeven" | "open";
 export interface Trade {
   id: string;
   user_id: string;
-  account_id: string;
+  account_id: string | null;
   trade_date: string;
   symbol: string;
   market_type: MarketType;
@@ -105,7 +105,8 @@ export interface Trade {
   emotion: string | null;
   confidence_level: number | null;
   notes: string | null;
-  screenshot_url: string | null;
+  lessons_learned: string | null;
+  screenshots: string[];
   status: TradeStatus;
   created_at: string;
 }
@@ -152,10 +153,70 @@ export interface TradeFormData {
   emotion?: string;
   confidence_level?: number;
   notes?: string;
-  screenshot_url?: string;
+  lessons_learned?: string;
+  screenshots?: string[];
   status: TradeStatus;
-  account_id: string;
+  account_id?: string | null;
 }
+
+export interface Goal {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  goal_type: string;
+  target_value: number;
+  current_value: number;
+  unit: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  created_at: string;
+}
+
+export interface Backtest {
+  id: string;
+  user_id: string;
+  strategy_name: string;
+  symbol: string;
+  market_type: string;
+  timeframe: string;
+  start_date: string;
+  end_date: string;
+  initial_balance: number;
+  final_balance: number | null;
+  total_trades: number;
+  winning_trades: number;
+  losing_trades: number;
+  win_rate: number | null;
+  profit_factor: number | null;
+  max_drawdown: number | null;
+  sharpe_ratio: number | null;
+  avg_rr: number | null;
+  notes: string | null;
+  trade_log: Json;
+  equity_curve: Json;
+  created_at: string;
+}
+
+export interface UserPreferences {
+  id: string;
+  user_id: string;
+  theme: "dark" | "light" | "system";
+  onboarding_completed: boolean;
+  currency: string;
+  timezone: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
 export interface ConnectionStage {
   label: string;
