@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { TrendingUp, Lock, Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
+import { TrendingUp, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,38 +19,16 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function UpdatePasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-  const [updating, setUpdating] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
 
-  React.useEffect(() => {
-    const code = searchParams.get("code");
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) {
-          setError("Invalid or expired reset link. Please request a new one.");
-        }
-        setLoading(false);
-      });
-    } else {
-      const hash = window.location.hash;
-      if (hash && hash.includes("access_token")) {
-        setLoading(false);
-      } else {
-        setError("Invalid reset link. Please request a new one from the login page.");
-        setLoading(false);
-      }
-    }
-  }, [searchParams, supabase]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUpdating(true);
+    setLoading(true);
     setError("");
 
     const { error } = await supabase.auth.updateUser({
@@ -59,9 +37,9 @@ export default function UpdatePasswordPage() {
 
     if (error) {
       setError(error.message);
-      setUpdating(false);
+      setLoading(false);
     } else {
-      setUpdating(false);
+      setLoading(false);
       setSuccess(true);
       setTimeout(() => router.push("/dashboard"), 3000);
     }
@@ -94,12 +72,7 @@ export default function UpdatePasswordPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-4" />
-                <p className="text-sm text-zinc-400">Verifying your reset link...</p>
-              </div>
-            ) : success ? (
+            {success ? (
               <div className="text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10">
                   <ArrowLeft className="h-6 w-6 text-emerald-500 rotate-90" />
@@ -152,8 +125,8 @@ export default function UpdatePasswordPage() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={updating}>
-                  {updating ? "Updating..." : "Update password"}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Updating..." : "Update password"}
                 </Button>
 
                 <Button variant="ghost" className="w-full" asChild>

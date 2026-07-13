@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError("");
 
-    const redirectUrl = `${window.location.origin}/auth/update-password`;
+    const redirectUrl = `${window.location.origin}/auth/callback?next=/auth/update-password`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
