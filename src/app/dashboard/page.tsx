@@ -10,6 +10,9 @@ import {
   Target,
   Activity,
   DollarSign,
+  Wifi,
+  WifiOff,
+  RefreshCw,
 } from "lucide-react";
 import {
   AreaChart,
@@ -54,6 +57,23 @@ interface Trade {
   trade_date: string;
 }
 
+interface BrokerConnection {
+  id: string;
+  provider: string;
+  broker_name: string;
+  account_name: string;
+  connection_status: string;
+  current_balance: number;
+  equity: number;
+  margin: number;
+  free_margin: number;
+  floating_pnl: number;
+  open_positions: number;
+  currency: string;
+  last_sync: string | null;
+  account_type: string;
+}
+
 function StatsSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -84,6 +104,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
 
 export default function DashboardPage() {
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [brokerConnections, setBrokerConnections] = useState<BrokerConnection[]>([]);
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -103,6 +124,16 @@ export default function DashboardPage() {
         if (prefs && !prefs.onboarding_completed) {
           setShowOnboarding(true);
         }
+
+        // Fetch broker connections
+        const { data: connections } = await supabase
+          .from("broker_connections")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (connections) {
+          setBrokerConnections(connections);
+        }
       }
 
       const { data, error } = await supabase
@@ -119,6 +150,46 @@ export default function DashboardPage() {
     }
     fetchTrades();
   }, []);
+
+  const handleBrokerSync = async (connectionId: string) => {
+    try {
+      const res = await fetch(`/api/broker-connections/${connectionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync" }),
+      });
+      if (res.ok) {
+        toast.success("Sync complete");
+        // Refresh connections
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("broker_connections")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (data) setBrokerConnections(data);
+      } else {
+        toast.error("Sync failed");
+      }
+    } catch {
+      toast.error("Sync failed");
+    }
+  };
+
+  const connectedBrokers = brokerConnections.filter(
+    (c) => c.connection_status === "connected" || c.connection_status === "syncing"
+  );
+  const totalBrokerBalance = connectedBrokers.reduce(
+    (sum, c) => sum + (c.equity ?? c.current_balance ?? 0),
+    0
+  );
+  const totalBrokerPnl = connectedBrokers.reduce(
+    (sum, c) => sum + (c.floating_pnl ?? 0),
+    0
+  );
+  const totalOpenPositions = connectedBrokers.reduce(
+    (sum, c) => sum + (c.open_positions ?? 0),
+    0
+  );
 
   const totalTrades = trades.length;
   const totalProfit = trades.reduce((sum, t) => sum + (t.profit_loss ?? 0), 0);
@@ -161,6 +232,101 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-zinc-100">Dashboard</h1>
           <p className="text-sm text-zinc-400">Welcome back! Here&apos;s your trading overview.</p>
         </div>
+
+        {/* Live Broker Status */}
+        {connectedBrokers.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border-zinc-800 bg-zinc-900/50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-zinc-400 flex items-center gap-2">
+                    <Wifi className="h-4 w-4 text-emerald-500" />
+                    Live Broker Accounts
+                  </CardTitle>
+                  <Link href="/accounts">
+                    <Button variant="ghost" size="sm" className="text-xs text-zinc-400">
+                      View All
+                    </Button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded-lg bg-zinc-800/50 p-3">
+                    <p className="text-xs text-zinc-500">Total Equity</p>
+                    <p className="text-lg font-semibold text-zinc-100">
+                      ${totalBrokerBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-zinc-800/50 p-3">
+                    <p className="text-xs text-zinc-500">Floating P&L</p>
+                    <p className={`text-lg font-semibold ${totalBrokerPnl >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                      {totalBrokerPnl >= 0 ? "+" : ""}${totalBrokerPnl.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-zinc-800/50 p-3">
+                    <p className="text-xs text-zinc-500">Open Positions</p>
+                    <p className="text-lg font-semibold text-zinc-100">{totalOpenPositions}</p>
+                  </div>
+                  <div className="rounded-lg bg-zinc-800/50 p-3">
+                    <p className="text-xs text-zinc-500">Connected</p>
+                    <p className="text-lg font-semibold text-emerald-500">
+                      {connectedBrokers.length} account{connectedBrokers.length !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {connectedBrokers.map((broker) => (
+                    <div
+                      key={broker.id}
+                      className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2"
+                    >
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          broker.connection_status === "connected"
+                            ? "bg-emerald-500"
+                            : broker.connection_status === "syncing"
+                              ? "bg-blue-500 animate-pulse"
+                              : "bg-zinc-500"
+                        }`}
+                      />
+                      <span className="text-xs text-zinc-300">{broker.account_name}</span>
+                      <span className="text-xs text-zinc-600">{broker.currency}</span>
+                      <button
+                        onClick={() => handleBrokerSync(broker.id)}
+                        className="text-zinc-500 hover:text-zinc-300"
+                        title="Sync now"
+                      >
+                        <RefreshCw className={`h-3 w-3 ${broker.connection_status === "syncing" ? "animate-spin" : ""}`} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {connectedBrokers.length === 0 && !loading && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border-zinc-800 bg-zinc-900/50">
+              <CardContent className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <WifiOff className="h-5 w-5 text-zinc-600" />
+                  <div>
+                    <p className="text-sm text-zinc-300">No broker connected</p>
+                    <p className="text-xs text-zinc-500">Connect a broker to see live account data</p>
+                  </div>
+                </div>
+                <Link href="/connect-broker">
+                  <Button size="sm" variant="outline">
+                    Connect Broker
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {loading ? (
           <StatsSkeleton />

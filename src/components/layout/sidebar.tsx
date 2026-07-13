@@ -18,6 +18,7 @@ import {
   Calculator,
   Award,
   FlaskConical,
+  Link as LinkIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ const navigation = [
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Accounts", href: "/accounts", icon: Wallet },
+  { name: "Connect Broker", href: "/connect-broker", icon: LinkIcon },
   { name: "Strategies", href: "/strategies", icon: Target },
   { name: "Calculators", href: "/calculators", icon: Calculator },
   { name: "Goals", href: "/goals", icon: Award },

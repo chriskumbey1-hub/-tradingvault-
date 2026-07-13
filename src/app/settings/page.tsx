@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { User, Shield, Bell, Palette, Save } from "lucide-react";
+import { User, Shield, Bell, Palette, Save, Link as LinkIcon, Wifi, WifiOff, RefreshCw, Trash2 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,18 @@ export default function SettingsPage() {
   const [emailNotifications, setEmailNotifications] = React.useState(true);
   const [weeklyReports, setWeeklyReports] = React.useState(true);
   const [lossAlerts, setLossAlerts] = React.useState(false);
+  const [brokerConnections, setBrokerConnections] = React.useState<Array<{
+    id: string;
+    provider: string;
+    broker_name: string;
+    account_name: string;
+    connection_status: string;
+    current_balance: number;
+    equity: number;
+    last_sync: string | null;
+    account_type: string;
+    currency: string;
+  }>>([]);
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -64,6 +77,17 @@ export default function SettingsPage() {
       setLoading(false);
     };
     fetchUser();
+
+    // Load broker connections
+    const fetchConnections = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("broker_connections")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setBrokerConnections(data);
+    };
+    fetchConnections();
 
     // Load saved preferences from localStorage
     try {
@@ -154,6 +178,47 @@ export default function SettingsPage() {
     setPasswordSaving(false);
   };
 
+  const handleBrokerSync = async (connectionId: string) => {
+    try {
+      const res = await fetch(`/api/broker-connections/${connectionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync" }),
+      });
+      if (res.ok) {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("broker_connections")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (data) setBrokerConnections(data);
+      }
+    } catch {}
+  };
+
+  const handleBrokerDisconnect = async (connectionId: string) => {
+    try {
+      await fetch(`/api/broker-connections/${connectionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "disconnect" }),
+      });
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("broker_connections")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setBrokerConnections(data);
+    } catch {}
+  };
+
+  const handleBrokerDelete = async (connectionId: string) => {
+    try {
+      await fetch(`/api/broker-connections/${connectionId}`, { method: "DELETE" });
+      setBrokerConnections((prev) => prev.filter((c) => c.id !== connectionId));
+    } catch {}
+  };
+
   const initials = fullName
     .split(" ")
     .map((n) => n[0])
@@ -192,6 +257,10 @@ export default function SettingsPage() {
               <TabsTrigger value="security" className="gap-2">
                 <Shield className="h-4 w-4" />
                 Security
+              </TabsTrigger>
+              <TabsTrigger value="brokers" className="gap-2">
+                <LinkIcon className="h-4 w-4" />
+                Brokers
               </TabsTrigger>
             </TabsList>
 
@@ -465,6 +534,111 @@ export default function SettingsPage() {
                       {passwordSaving ? "Updating..." : "Update Password"}
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="brokers">
+              <Card className="border-zinc-800 bg-zinc-900/50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg text-zinc-100">
+                        Broker Connections
+                      </CardTitle>
+                      <p className="text-sm text-zinc-400 mt-1">
+                        Manage your connected broker accounts
+                      </p>
+                    </div>
+                    <Link href="/connect-broker">
+                      <Button size="sm" className="gap-2">
+                        <LinkIcon className="h-4 w-4" />
+                        Connect New
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {brokerConnections.length === 0 ? (
+                    <div className="text-center py-8">
+                      <WifiOff className="mx-auto h-10 w-10 text-zinc-600 mb-3" />
+                      <p className="text-sm text-zinc-400">
+                        No broker connections yet
+                      </p>
+                      <Link href="/connect-broker">
+                        <Button variant="outline" size="sm" className="mt-3">
+                          Connect a Broker
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {brokerConnections.map((conn) => (
+                        <div
+                          key={conn.id}
+                          className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900 p-4"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`h-2 w-2 rounded-full ${
+                                conn.connection_status === "connected"
+                                  ? "bg-emerald-500"
+                                  : conn.connection_status === "syncing"
+                                    ? "bg-blue-500 animate-pulse"
+                                    : conn.connection_status === "error"
+                                      ? "bg-red-500"
+                                      : "bg-zinc-500"
+                              }`}
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-zinc-200">
+                                {conn.account_name}
+                              </p>
+                              <p className="text-xs text-zinc-500">
+                                {conn.broker_name} &middot; {conn.account_type} &middot; {conn.currency}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-zinc-500">
+                              {conn.last_sync
+                                ? `Synced ${new Date(conn.last_sync).toLocaleTimeString()}`
+                                : "Never synced"}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleBrokerSync(conn.id)}
+                              disabled={conn.connection_status === "syncing"}
+                              aria-label="Sync now"
+                            >
+                              <RefreshCw
+                                className={`h-4 w-4 ${
+                                  conn.connection_status === "syncing" ? "animate-spin" : ""
+                                }`}
+                              />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleBrokerDisconnect(conn.id)}
+                              aria-label="Disconnect"
+                            >
+                              <WifiOff className="h-4 w-4 text-zinc-500" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleBrokerDelete(conn.id)}
+                              aria-label="Delete connection"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
