@@ -24,9 +24,25 @@ export default function SignupPage() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
+  const [passwordStrength, setPasswordStrength] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [sent, setSent] = React.useState(false);
+
+  const getPasswordStrength = (pwd: string): { score: number; label: string; color: string } => {
+    let score = 0;
+    if (pwd.length >= 6) score++;
+    if (pwd.length >= 10) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+    if (score <= 1) return { score, label: "Weak", color: "bg-red-500" };
+    if (score <= 2) return { score, label: "Fair", color: "bg-orange-500" };
+    if (score <= 3) return { score, label: "Good", color: "bg-yellow-500" };
+    if (score <= 4) return { score, label: "Strong", color: "bg-emerald-500" };
+    return { score, label: "Very Strong", color: "bg-emerald-400" };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,7 +165,10 @@ export default function SignupPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setPasswordStrength(getPasswordStrength(e.target.value).score);
+                    }}
                     className="pl-9 pr-9"
                     required
                     minLength={6}
@@ -166,6 +185,25 @@ export default function SignupPage() {
                     )}
                   </button>
                 </div>
+                {password && (
+                  <div className="space-y-1">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div
+                          key={i}
+                          className={`h-1 flex-1 rounded-full transition-colors ${
+                            i <= passwordStrength
+                              ? getPasswordStrength(password).color
+                              : "bg-zinc-700"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-zinc-500">
+                      {getPasswordStrength(password).label}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>

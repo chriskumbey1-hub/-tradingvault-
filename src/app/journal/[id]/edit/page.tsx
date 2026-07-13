@@ -141,8 +141,16 @@ export default function EditTradePage() {
   };
 
   const handleFiles = async (files: FileList | File[]) => {
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
     const validTypes = ["image/png", "image/jpeg", "image/gif"];
-    const fileArray = Array.from(files).filter((f) => validTypes.includes(f.type));
+    const fileArray = Array.from(files).filter((f) => {
+      if (!validTypes.includes(f.type)) return false;
+      if (f.size > MAX_FILE_SIZE) {
+        toast.error(`${f.name} exceeds 10MB limit`);
+        return false;
+      }
+      return true;
+    });
     if (fileArray.length === 0) return;
     if (screenshots.length + fileArray.length > 5) {
       setError("Maximum 5 screenshots allowed.");

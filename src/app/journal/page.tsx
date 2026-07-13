@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Plus,
@@ -82,9 +82,11 @@ function TableSkeleton() {
 
 export default function JournalPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get("search") || "";
   const [trades, setTrades] = React.useState<Trade[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [search, setSearch] = React.useState("");
+  const [search, setSearch] = React.useState(urlSearch);
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [directionFilter, setDirectionFilter] = React.useState("all");
 
@@ -104,6 +106,11 @@ export default function JournalPage() {
 
     fetchTrades();
   }, []);
+
+  React.useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    if (urlSearch) setSearch(urlSearch);
+  }, [searchParams]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this trade?")) return;

@@ -56,6 +56,7 @@ export default function BacktestsPage() {
   const [showCreate, setShowCreate] = React.useState(false);
   const [editing, setEditing] = React.useState<Backtest | null>(null);
   const [saving, setSaving] = React.useState(false);
+  const [confirmDelete, setConfirmDelete] = React.useState<string | null>(null);
   const [formData, setFormData] = React.useState({
     strategy_name: "",
     symbol: "",
@@ -176,14 +177,19 @@ export default function BacktestsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this backtest?")) return;
-    const { error } = await supabase.from("backtests").delete().eq("id", id);
+    setConfirmDelete(id);
+  };
+
+  const confirmDeleteAction = async () => {
+    if (!confirmDelete) return;
+    const { error } = await supabase.from("backtests").delete().eq("id", confirmDelete);
     if (!error) {
       fetchBacktests();
       toast.success("Backtest deleted");
     } else {
       toast.error("Failed to delete backtest");
     }
+    setConfirmDelete(null);
   };
 
   const openEdit = (bt: Backtest) => {
@@ -322,6 +328,19 @@ export default function BacktestsPage() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!confirmDelete} onOpenChange={(open) => { if (!open) setConfirmDelete(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Backtest</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-zinc-400">Are you sure you want to delete this backtest? This action cannot be undone.</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDeleteAction}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showCreate || !!editing} onOpenChange={(open) => { if (!open) { setShowCreate(false); setEditing(null); } }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">

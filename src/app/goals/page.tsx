@@ -47,6 +47,7 @@ export default function GoalsPage() {
   const [showCreate, setShowCreate] = React.useState(false);
   const [editingGoal, setEditingGoal] = React.useState<Goal | null>(null);
   const [saving, setSaving] = React.useState(false);
+  const [confirmDelete, setConfirmDelete] = React.useState<string | null>(null);
   const [formData, setFormData] = React.useState({
     title: "",
     description: "",
@@ -164,14 +165,19 @@ export default function GoalsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this goal?")) return;
-    const { error } = await supabase.from("goals").delete().eq("id", id);
+    setConfirmDelete(id);
+  };
+
+  const confirmDeleteAction = async () => {
+    if (!confirmDelete) return;
+    const { error } = await supabase.from("goals").delete().eq("id", confirmDelete);
     if (!error) {
       fetchGoals();
       toast.success("Goal deleted");
     } else {
       toast.error("Failed to delete goal");
     }
+    setConfirmDelete(null);
   };
 
   const openEdit = (goal: Goal) => {
@@ -323,6 +329,19 @@ export default function GoalsPage() {
           </>
         )}
       </div>
+
+      <Dialog open={!!confirmDelete} onOpenChange={(open) => { if (!open) setConfirmDelete(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Goal</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-zinc-400">Are you sure you want to delete this goal? This action cannot be undone.</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDeleteAction}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showCreate || !!editingGoal} onOpenChange={(open) => { if (!open) { setShowCreate(false); setEditingGoal(null); } }}>
         <DialogContent className="max-w-md">

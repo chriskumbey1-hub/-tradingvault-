@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Bell, Search, LogOut, User, Settings, Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Bell, Search, LogOut, User, Settings, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -25,7 +26,18 @@ interface NavbarProps {
 }
 
 export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
+  const router = useRouter();
   const [searchOpen, setSearchOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/journal?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setSearchOpen(false);
+    }
+  };
 
   return (
     <header className="flex h-14 items-center gap-2 border-b border-zinc-800 bg-zinc-900/50 px-3 sm:px-4 md:px-6">
@@ -40,15 +52,17 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
       </Button>
 
       <div className="flex flex-1 items-center gap-2">
-        <div className="relative hidden sm:block max-w-md flex-1">
+        <form onSubmit={handleSearch} className="relative hidden sm:block max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <input
             type="search"
             placeholder="Search trades..."
             aria-label="Search trades"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-800/50 py-2 pl-9 pr-4 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-        </div>
+        </form>
         <Button
           variant="ghost"
           size="icon"
@@ -61,17 +75,36 @@ export function Navbar({ user, onLogout, onMenuToggle }: NavbarProps) {
       </div>
 
       {searchOpen && (
-        <div className="absolute left-0 top-14 z-50 w-full border-b border-zinc-800 bg-zinc-900 p-3 sm:hidden">
-          <div className="relative">
+        <div className="fixed inset-0 left-0 top-14 z-50 w-full border-b border-zinc-800 bg-zinc-900 p-3 sm:hidden">
+          <form onSubmit={handleSearch} className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
             <input
               type="search"
               placeholder="Search trades..."
               aria-label="Search trades"
               autoFocus
-              className="w-full rounded-lg border border-zinc-800 bg-zinc-800/50 py-2 pl-9 pr-4 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }
+              }}
+              className="w-full rounded-lg border border-zinc-800 bg-zinc-800/50 py-2 pl-9 pr-10 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
-          </div>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchOpen(false);
+                setSearchQuery("");
+              }}
+              aria-label="Close search"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </form>
         </div>
       )}
 

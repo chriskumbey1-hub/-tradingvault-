@@ -43,6 +43,11 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [compactView, setCompactView] = React.useState(false);
+  const [autoSave, setAutoSave] = React.useState(true);
+  const [emailNotifications, setEmailNotifications] = React.useState(true);
+  const [weeklyReports, setWeeklyReports] = React.useState(true);
+  const [lossAlerts, setLossAlerts] = React.useState(false);
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -59,7 +64,25 @@ export default function SettingsPage() {
       setLoading(false);
     };
     fetchUser();
+
+    // Load saved preferences from localStorage
+    try {
+      const savedPrefs = JSON.parse(localStorage.getItem("tradevault-prefs") || "{}");
+      if (savedPrefs.compactView !== undefined) setCompactView(savedPrefs.compactView);
+      if (savedPrefs.autoSave !== undefined) setAutoSave(savedPrefs.autoSave);
+      if (savedPrefs.emailNotifications !== undefined) setEmailNotifications(savedPrefs.emailNotifications);
+      if (savedPrefs.weeklyReports !== undefined) setWeeklyReports(savedPrefs.weeklyReports);
+      if (savedPrefs.lossAlerts !== undefined) setLossAlerts(savedPrefs.lossAlerts);
+    } catch {}
   }, []);
+
+  const savePreferences = (key: string, value: boolean) => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("tradevault-prefs") || "{}");
+      saved[key] = value;
+      localStorage.setItem("tradevault-prefs", JSON.stringify(saved));
+    } catch {}
+  };
 
   const handleSaveProfile = async () => {
     setSaving(true);
@@ -202,8 +225,8 @@ export default function SettingsPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <Button variant="outline" size="sm">
-                            Change Avatar
+                          <Button variant="outline" size="sm" disabled className="text-xs">
+                            Coming Soon
                           </Button>
                           <p className="mt-2 text-xs text-zinc-500">
                             JPG, PNG or GIF. Max size 2MB.
@@ -325,7 +348,7 @@ export default function SettingsPage() {
                         Show more data in tables
                       </p>
                     </div>
-                    <Switch />
+                    <Switch checked={compactView} onCheckedChange={(v) => { setCompactView(v); savePreferences("compactView", v); }} />
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
@@ -337,7 +360,7 @@ export default function SettingsPage() {
                         Automatically save trades as you enter them
                       </p>
                     </div>
-                    <Switch checked />
+                    <Switch checked={autoSave} onCheckedChange={(v) => { setAutoSave(v); savePreferences("autoSave", v); }} />
                   </div>
                 </CardContent>
               </Card>
@@ -360,7 +383,7 @@ export default function SettingsPage() {
                         Receive email updates about your trading
                       </p>
                     </div>
-                    <Switch checked />
+                    <Switch checked={emailNotifications} onCheckedChange={(v) => { setEmailNotifications(v); savePreferences("emailNotifications", v); }} />
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
@@ -372,7 +395,7 @@ export default function SettingsPage() {
                         Get a weekly summary of your performance
                       </p>
                     </div>
-                    <Switch checked />
+                    <Switch checked={weeklyReports} onCheckedChange={(v) => { setWeeklyReports(v); savePreferences("weeklyReports", v); }} />
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
@@ -384,7 +407,7 @@ export default function SettingsPage() {
                         Alert when daily loss exceeds threshold
                       </p>
                     </div>
-                    <Switch />
+                    <Switch checked={lossAlerts} onCheckedChange={(v) => { setLossAlerts(v); savePreferences("lossAlerts", v); }} />
                   </div>
                 </CardContent>
               </Card>
