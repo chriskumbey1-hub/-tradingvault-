@@ -102,9 +102,9 @@ export default function ConnectBrokerPage() {
         body: JSON.stringify({
           provider: selectedProvider.id,
           credentials: credentialValues,
-          accountName: accountName || `${selectedProvider.displayName} Account`,
+          accountName: accountName || `${selectedProvider.name} Account`,
           accountType,
-          brokerName: selectedProvider.displayName,
+          brokerName: selectedProvider.name,
         }),
       });
 
@@ -273,7 +273,7 @@ export default function ConnectBrokerPage() {
                     </Button>
                     <div>
                       <CardTitle className="text-zinc-100">
-                        {selectedProvider.displayName} Credentials
+                        {selectedProvider.name} Credentials
                       </CardTitle>
                       <CardDescription className="text-zinc-400">
                         {!selectedProvider.hasRealApi
@@ -298,7 +298,7 @@ export default function ConnectBrokerPage() {
                     </Label>
                     <Input
                       id="accountName"
-                      placeholder={`${selectedProvider.displayName} Account`}
+                      placeholder={`${selectedProvider.name} Account`}
                       value={accountName}
                       onChange={(e) => setAccountName(e.target.value)}
                       className="bg-zinc-800 border-zinc-700"
@@ -423,7 +423,7 @@ export default function ConnectBrokerPage() {
                 <CardHeader>
                   <CardTitle className="text-zinc-100">Test Connection</CardTitle>
                   <CardDescription className="text-zinc-400">
-                    Verify your credentials and connect to {selectedProvider.displayName}
+                    Verify your credentials and connect to {selectedProvider.name}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -432,7 +432,7 @@ export default function ConnectBrokerPage() {
                       <Wifi className="mx-auto h-12 w-12 text-zinc-600 mb-4" />
                       <p className="text-zinc-400">
                         Click the button below to test your connection to{" "}
-                        {selectedProvider.displayName}
+                        {selectedProvider.name}
                       </p>
                     </div>
                   )}
@@ -545,7 +545,7 @@ export default function ConnectBrokerPage() {
                 <CardHeader>
                   <CardTitle className="text-zinc-100">Connection Saved</CardTitle>
                   <CardDescription className="text-zinc-400">
-                    Your {selectedProvider.displayName} account is now connected
+                    Your {selectedProvider.name} account is now connected
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -554,7 +554,7 @@ export default function ConnectBrokerPage() {
                       <Check className="h-8 w-8 text-emerald-500" />
                     </div>
                     <h3 className="text-lg font-medium text-zinc-100">
-                      {accountName || selectedProvider.displayName + " Account"}
+                      {accountName || selectedProvider.name + " Account"}
                     </h3>
                     <p className="text-sm text-zinc-400">
                       Your account will sync automatically every 5 minutes. You can
