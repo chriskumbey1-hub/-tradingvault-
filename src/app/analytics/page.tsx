@@ -93,8 +93,8 @@ export default function AnalyticsPage() {
     const avgRR =
       rrTrades.length > 0
         ? rrTrades.reduce((sum, t) => {
-            const risk = Math.abs(t.entry_price - t.stop_loss);
-            const reward = Math.abs(t.take_profit - t.entry_price);
+            const risk = Math.abs(t.entry_price - (t.stop_loss ?? 0));
+            const reward = Math.abs((t.take_profit ?? 0) - t.entry_price);
             return sum + (risk > 0 ? reward / risk : 0);
           }, 0) / rrTrades.length
         : 0;
