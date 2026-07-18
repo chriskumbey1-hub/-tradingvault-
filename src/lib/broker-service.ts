@@ -1,13 +1,13 @@
 import crypto from "crypto";
 
-const ENCRYPTION_KEY = process.env.ACCOUNT_ENCRYPTION_KEY;
-if (!ENCRYPTION_KEY) {
-  throw new Error("ACCOUNT_ENCRYPTION_KEY environment variable is required");
-}
 const ALGORITHM = "aes-256-cbc";
 
 function getKey(): Buffer {
-  return crypto.createHash("sha256").update(ENCRYPTION_KEY!).digest();
+  const key = process.env.ACCOUNT_ENCRYPTION_KEY;
+  if (!key) {
+    throw new Error("ACCOUNT_ENCRYPTION_KEY environment variable is required");
+  }
+  return crypto.createHash("sha256").update(key).digest();
 }
 
 export function encryptPassword(password: string): string {
