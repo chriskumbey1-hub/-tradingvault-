@@ -7,7 +7,7 @@ if (!ENCRYPTION_KEY) {
 const ALGORITHM = "aes-256-cbc";
 
 function getKey(): Buffer {
-  return crypto.createHash("sha256").update(ENCRYPTION_KEY).digest();
+  return crypto.createHash("sha256").update(ENCRYPTION_KEY!).digest();
 }
 
 export function encryptPassword(password: string): string {
