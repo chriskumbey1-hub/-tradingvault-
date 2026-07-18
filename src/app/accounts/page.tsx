@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   Plus,
-
+  Package,
   RefreshCw,
   MoreHorizontal,
   Pencil,
@@ -399,6 +399,15 @@ export default function AccountsPage() {
             <Button size="sm" className="gap-2" onClick={() => setPlatformModalOpen(true)}>
               <Plus className="h-4 w-4" />
               Add Account
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-2"
+              onClick={() => window.location.href = "/imported-trades"}
+            >
+              <Package className="h-4 w-4" />
+              Imported Trades
             </Button>
           </div>
         </div>
